@@ -1,0 +1,60 @@
+# -*- coding:utf-8 -*-
+_author_ = 'NULL'
+
+import pymysql
+import re
+import urllib.request
+
+
+def createdatabase():
+    conn=pymysql.connect(host='127.0.0.1',port=3306,user='root',password='******',charset='utf8') #与数据库MySQL建立连接
+    cursor=conn.cursor()                        #创建游标
+    cursor.execute("create database if not exists web") #创建数据库
+    cursor.execute("use web")
+                                                #创建数据表
+    cursor.execute("create table if not exists ccsutest(id int not null AUTO_INCREMENT PRIMARY  KEY,name TINYTEXT,address TINYTEXT)")
+    conn.commit()                               #提交，保存
+    cursor.close()                              #关闭游标
+    conn.close()                                #关闭连接
+def gettext(web):
+    response = urllib.request.urlopen(web)
+    html = response.read()                      #获取网页代码
+    html = html.decode('utf8')                  #解码
+    r1 = 'a href=".*"'                        #网址正则表达式  r1
+    r1 = re.compile(r1)                         #转换
+    find = re.findall(r1, html)                 #寻找需要的信息
+    return find
+def push(text):
+    pre='http://www.ccsu.cn'
+    b=r'a href="(.*)" target'                   #地址的正则表达式 b
+    c=re.compile(b)                             #转换 c
+    d = re.findall(c,text)                      #寻找地址并返回元组 d
+    e=r'title="(.*)" class'                     #标题的正则表达式 e
+    f=re.compile(e)                             #转换
+    g=re.findall(f,text)                        #获取所有的标题  g
+    if(len(g)!=1):                         		#判断是否个数统一
+        print('error')
+        return 0
+    conn2 = pymysql.connect(host='127.0.0.1', port=3306, user='root', password='123456', charset='utf8')  # 建立连接
+    cursor2 = conn2.cursor()                    # 创建游标  cursor2
+    cursor2.execute("use web")                  # 执行MySQL语句
+    for i in range(len(g)):
+       address=pre+d[0]                         #加上头的正确地址
+       # print(address,)
+       j=g[i-1]                                 #获取含有标题的文本
+       j=j.replace('&ldquo;','')                #替换无用信息
+       j=j.replace('&rdquo;','')                #替换无用信息
+       j = j.replace('&mdash;', '')             #替换无用信息
+       # print (j)                                #输出标题
+       l=(j,address,'texttext')                 #把变量存入l中
+       cursor2.execute("insert into ccsutest(name,address,text) values('%s','%s','%s')" %l)  #输出到数据库
+       conn2.commit()                           # 提交，保存
+    num=cursor2.execute("select * from ccsutest")   #读取数据库信息，验证结果
+    cursor2.close()                             # 关闭游标
+    conn2.close()                               # 关闭连接
+    print (num)                           		#输出数据库信息
+    
+web1='http://www.ccsu.cn/structure/index.htm'   # 存储网址
+createdatabase()                                #创建数据库
+for i in gettext(web1):                        	#存入数据库
+    push(i)
