@@ -20,7 +20,7 @@ def gettext(web):
     response = urllib.request.urlopen(web)
     html = response.read()                      #获取网页代码
     html = html.decode('utf8')                  #解码
-    r1 = 'a href=".*"'                        #网址正则表达式  r1
+    r1 = 'a href=".*"'                          #网址正则表达式  r1
     r1 = re.compile(r1)                         #转换
     find = re.findall(r1, html)                 #寻找需要的信息
     return find
