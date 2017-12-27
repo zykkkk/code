@@ -45,9 +45,9 @@ def push(text):
        j=j.replace('&ldquo;','')                #替换无用信息
        j=j.replace('&rdquo;','')                #替换无用信息
        j = j.replace('&mdash;', '')             #替换无用信息
-       # print (j)                                #输出标题
-       l=(j,address,'texttext')                 #把变量存入l中
-       cursor2.execute("insert into ccsutest(name,address,text) values('%s','%s','%s')" %l)  #输出到数据库
+       # print (j)                              #输出标题
+       l=(j,address)                            #把变量存入l中
+       cursor2.execute("insert into ccsutest(name,address,text) values('%s','%s')" %l)  #输出到数据库
        conn2.commit()                           # 提交，保存
     num=cursor2.execute("select * from ccsutest")   #读取数据库信息，验证结果
     cursor2.close()                             # 关闭游标
